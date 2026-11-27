@@ -28,6 +28,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
           startupProbe:
             httpGet:
               path: /actuator/health/liveness

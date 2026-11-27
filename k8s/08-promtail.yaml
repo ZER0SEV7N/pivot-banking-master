@@ -20,13 +20,26 @@ data:
             labels:
               job: pivot-banking
               __path__: /var/log/pods/pivot-banking_*/*/*.log
+        relabel_configs:
+          # service = nombre del Deployment a partir del nombre del pod
+          # (pivot-ms-customer-6b9f7c8d5-x2k4m -> pivot-ms-customer)
+          - source_labels: ['__path__']
+            regex: '.*/pivot-banking_(?P<service>[a-z0-9][a-z0-9-]+)-[a-z0-9]+-[a-z0-9]+/.*'
+            target_label: service
+            replacement: '$1'
         pipeline_stages:
-          - cri: {}
+          # Docker Desktop escribe los logs de los pods en formato Docker JSON.
+          # En un cluster con containerd/CRI, reemplazar por: - cri: {}
+          - docker: {}
           - regex:
-              expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?P<thread>[^\]]+)\] (?P<level>\S+)\s+\[(?P<service>[^\]]+)\] \[corrId=(?P<correlationId>[^\]]+)\] (?P<logger>\S+) - (?P<message>.*)$'
+              expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?P<thread>[^\]]+)\] (?P<level>\S+)\s+\[(?P<service>[^\]]+)\] \[corrId=(?P<correlationId>[^\]]+)\]( \[traceId=(?P<traceId>[^\]]+) spanId=(?P<spanId>[^\]]+)\])? (?P<logger>\S+) - (?P<message>.*)\s*$'
+          - timestamp:
+              source: timestamp
+              format: '2006-01-02 15:04:05.000'
           - labels:
-              level:
               service:
+              level:
+              correlationId:
 ---
 apiVersion: apps/v1
 kind: DaemonSet

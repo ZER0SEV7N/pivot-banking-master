@@ -1,0 +1,591 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "pivot-banking",
+    "loki",
+    "microservices",
+    "metricas",
+    "logs"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_LOKI",
+        "type": "datasource",
+        "query": "loki",
+        "current": {
+          "text": "Loki",
+          "value": "Loki"
+        },
+        "hide": 2
+      },
+      {
+        "name": "service",
+        "label": "Microservicio",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "${DS_LOKI}"
+        },
+        "query": {
+          "type": 1,
+          "label": "service",
+          "stream": "{job=\"pivot-banking\"}"
+        },
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": {
+          "text": "Todos",
+          "value": "$__all"
+        },
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "level",
+        "label": "Nivel",
+        "type": "custom",
+        "query": "INFO,WARN,ERROR,DEBUG",
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": {
+          "text": "Todos",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "search",
+        "label": "Correlation ID / texto",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Pivot Banking · Métricas y Logs (Loki)",
+  "uid": "pivot-banking-observability",
+  "version": 2,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Eventos de log",
+      "description": "Total de líneas de log ingeridas por Loki en el rango seleccionado (métrica derivada de logs).",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"pivot-banking\", service=~\"$service\", level=~\"$level\"}[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Errores (ERROR)",
+      "description": "Conteo de líneas con nivel ERROR. Es la métrica de salud principal del sistema.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"pivot-banking\", service=~\"$service\", level=\"ERROR\"}[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Advertencias (WARN)",
+      "description": "Conteo de líneas con nivel WARN en el rango seleccionado.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"pivot-banking\", service=~\"$service\", level=\"WARN\"}[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Microservicios reportando",
+      "description": "Cantidad de microservicios que enviaron al menos una línea de log en el rango.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "count(sum by (service) (count_over_time({job=\"pivot-banking\", service=~\"$service\"}[$__range])))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Eventos por microservicio (por minuto)",
+      "description": "Métrica derivada de Loki: count_over_time agrupado por el label service.",
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (count_over_time({job=\"pivot-banking\", service=~\"$service\", level=~\"$level\"}[1m]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum",
+            "lastNotNull"
+          ],
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "bargauge",
+      "title": "Errores y warnings por microservicio",
+      "description": "Acumulado de líneas ERROR/WARN en el rango, por servicio. Permite ubicar rápido el microservicio con problemas.",
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (count_over_time({job=\"pivot-banking\", service=~\"$service\", level=~\"ERROR|WARN\"}[$__range]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "auto",
+        "sizing": "auto",
+        "minVizHeight": 16,
+        "minVizWidth": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Errores vs. warnings en el tiempo",
+      "description": "Series separadas por nivel para detectar picos de ERROR o WARN.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"pivot-banking\", service=~\"$service\", level=\"ERROR\"}[1m]))",
+          "legendFormat": "ERROR",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(count_over_time({job=\"pivot-banking\", service=~\"$service\", level=\"WARN\"}[1m]))",
+          "legendFormat": "WARN",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "sum",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 60,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ERROR"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WARN"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "type": "logs",
+      "title": "Últimos errores (ERROR)",
+      "description": "Logs de nivel ERROR de los microservicios seleccionados. Ordenados del más reciente al más antiguo.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "{job=\"pivot-banking\", service=~\"$service\", level=\"ERROR\"} |= \"$search\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 9,
+      "type": "logs",
+      "title": "Logs en vivo (filtra por microservicio, nivel y correlationId)",
+      "description": "Escribe un correlationId o texto en la variable 'Correlation ID / texto' para aislar una transacción completa.",
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "expr": "{job=\"pivot-banking\", service=~\"$service\", level=~\"$level\"} |= \"$search\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}

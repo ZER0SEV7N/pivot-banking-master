@@ -9,7 +9,39 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
+  # Logs escritos por cada microservicio en <repo>/logs/<app>.log
+  # (Docker Compose monta el workspace completo en /workspace en modo solo lectura).
   - job_name: pivot-microservices-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: pivot-banking
+          __path__: /workspace/pivot-ms-*/logs/*.log
+      - targets:
+          - localhost
+        labels:
+          job: pivot-banking
+          __path__: /workspace/logs/*.log
+    relabel_configs:
+      # service = nombre de la carpeta del microservicio (ms-customer, ms-yanki, ...)
+      - source_labels: ['__path__']
+        regex: '.*/pivot-(ms-[^/]+)/logs/.*'
+        target_label: service
+        replacement: '$1'
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?P<thread>[^\]]+)\] (?P<level>\S+)\s+\[(?P<service>[^\]]+)\] \[corrId=(?P<correlationId>[^\]]+)\]( \[traceId=(?P<traceId>[^\]]+) spanId=(?P<spanId>[^\]]+)\])? (?P<logger>\S+) - (?P<message>.*)\s*$'
+      - timestamp:
+          source: timestamp
+          format: '2006-01-02 15:04:05.000'
+      - labels:
+          service:
+          level:
+          correlationId:
+
+  # Copias manuales de logs dentro de ENVIROMENT/logs (compatibilidad).
+  - job_name: pivot-manual-logs
     static_configs:
       - targets:
           - localhost
@@ -18,7 +50,11 @@ scrape_configs:
           __path__: /var/log/pivot/*.log
     pipeline_stages:
       - regex:
-          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?P<thread>[^\]]+)\] (?P<level>\S+)\s+\[(?P<service>[^\]]+)\] \[corrId=(?P<correlationId>[^\]]+)\] (?P<logger>\S+) - (?P<message>.*)$'
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?P<thread>[^\]]+)\] (?P<level>\S+)\s+\[(?P<service>[^\]]+)\] \[corrId=(?P<correlationId>[^\]]+)\]( \[traceId=(?P<traceId>[^\]]+) spanId=(?P<spanId>[^\]]+)\])? (?P<logger>\S+) - (?P<message>.*)\s*$'
+      - timestamp:
+          source: timestamp
+          format: '2006-01-02 15:04:05.000'
       - labels:
-          level:
           service:
+          level:
+          correlationId:

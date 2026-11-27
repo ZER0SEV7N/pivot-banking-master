@@ -81,7 +81,11 @@ services:
   promtail:
     image: grafana/promtail:3.0.0
     container_name: pivot-promtail
+    restart: unless-stopped
     volumes:
+      # Logs de cada microservicio: <workspace>/ms-*/logs/*.log
+      - ..:/workspace:ro
+      # Copias manuales de logs dentro de ENVIROMENT/logs
       - ./logs:/var/log/pivot:ro
       - ./observability/promtail-config.yml:/etc/promtail/config.yml:ro
     command: -config.file=/etc/promtail/config.yml
@@ -90,19 +94,39 @@ services:
     networks:
       - pivot-network
 
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: pivot-tempo
+    restart: unless-stopped
+    command: -config.file=/etc/tempo/tempo.yaml
+    ports:
+      - "3200:3200"   # Tempo HTTP API / Grafana datasource
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    volumes:
+      - ./observability/tempo-config.yml:/etc/tempo/tempo.yaml:ro
+      - pivot_tempo_data:/var/tempo
+    networks:
+      - pivot-network
+
   grafana:
     image: grafana/grafana:11.0.0
     container_name: pivot-grafana
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/pivot-banking-grafana-dashboard.json
     volumes:
       - ./observability/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./observability/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./observability/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - loki
+      - tempo
     networks:
       - pivot-network
 
@@ -110,6 +134,8 @@ volumes:
   pivot_mongo_data:
     driver: local
   pivot_redis_data:
+    driver: local
+  pivot_tempo_data:
     driver: local
 
 networks:

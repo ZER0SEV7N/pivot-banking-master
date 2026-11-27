@@ -28,6 +28,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_auth"
           startupProbe:
@@ -101,6 +103,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_customer"
           startupProbe:
@@ -174,6 +178,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_credit"
           startupProbe:
@@ -247,6 +253,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_account"
           startupProbe:
@@ -320,6 +328,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_transaction"
           startupProbe:
@@ -393,6 +403,8 @@ spec:
           env:
             - name: SPRING_CONFIG_IMPORT
               value: "optional:configserver:http://ms-config:8888"
+            - name: EUREKA_URI
+              value: "http://ms-eureka:8761/eureka/"
             - name: MONGODB_URI
               value: "mongodb://pivot-mongodb:27017/db_pivot_yanki"
           startupProbe:
