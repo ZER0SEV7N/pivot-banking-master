@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pivot-mongodb-pvc
+  namespace: pivot-banking
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-mongodb
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-mongodb
+  template:
+    metadata:
+      labels:
+        app: pivot-mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:7.0
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: pivot-mongodb-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-mongodb
+  namespace: pivot-banking
+spec:
+  selector:
+    app: pivot-mongodb
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-redis
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-redis
+  template:
+    metadata:
+      labels:
+        app: pivot-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.4-alpine
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-redis
+  namespace: pivot-banking
+spec:
+  selector:
+    app: pivot-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-kafka
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-kafka
+  template:
+    metadata:
+      labels:
+        app: pivot-kafka
+    spec:
+      containers:
+        - name: kafka
+          image: apache/kafka:3.8.0
+          ports:
+            - containerPort: 9092
+          env:
+            - name: KAFKA_NODE_ID
+              value: "1"
+            - name: KAFKA_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:29093"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://pivot-kafka:9092"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+            - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+              value: "1@localhost:29093"
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: "PLAINTEXT"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-kafka
+  namespace: pivot-banking
+spec:
+  selector:
+    app: pivot-kafka
+  ports:
+    - port: 9092
+      targetPort: 9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-vault
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-vault
+  template:
+    metadata:
+      labels:
+        app: pivot-vault
+    spec:
+      containers:
+        - name: vault
+          image: hashicorp/vault:1.17
+          ports:
+            - containerPort: 8200
+          env:
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              valueFrom:
+                secretKeyRef:
+                  name: pivot-secrets
+                  key: VAULT_TOKEN
+            - name: VAULT_DEV_LISTEN_ADDRESS
+              value: "0.0.0.0:8200"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-vault
+  namespace: pivot-banking
+spec:
+  selector:
+    app: pivot-vault
+  ports:
+    - port: 8200
+      targetPort: 8200

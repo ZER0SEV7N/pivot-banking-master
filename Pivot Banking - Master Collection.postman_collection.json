@@ -1,0 +1,2287 @@
+{
+  "info": {
+    "_postman_id": "65b3041a-e4cc-488f-a098-d80a76d2cee0",
+    "name": "Pivot Banking - Master Collection (Phase I)",
+    "description": "Master End-to-End Postman Collection for the Pivot Banking System.\n\nIncludes centralized variables, automated variable chaining, and test assertions across all 5 microservices:\n1. **ms-config (:8888):** Centralized configuration server.\n2. **ms-customer (:8081):** Personal & Business customer management.\n3. **ms-account (:8082):** Passive bank products (Savings, Checking, Fixed-Term).\n4. **ms-credit (:8083):** Active bank products (Personal/Business Loans & Credit Cards).\n5. **ms-transaction (:8084):** Immutable Financial Ledger & Transaction Orchestrator.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. ms-config",
+      "description": "Centralized Spring Cloud Config Server (:8888) serving externalized YAML configurations for all banking microservices.",
+      "item": [
+        {
+          "name": "1. Get ms-customer Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Config server returns propertySources\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property(\"propertySources\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-customer/default",
+              "host": [
+                "{{urlMsConfig}}"
+              ],
+              "path": [
+                "ms-customer",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get ms-account Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-account/default",
+              "host": [
+                "{{urlMsConfig}}"
+              ],
+              "path": [
+                "ms-account",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get ms-credit Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-credit/default",
+              "host": [
+                "{{urlMsConfig}}"
+              ],
+              "path": [
+                "ms-credit",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get ms-transaction Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-transaction/default",
+              "host": [
+                "{{urlMsConfig}}"
+              ],
+              "path": [
+                "ms-transaction",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. ms-customer",
+      "description": "Reactive Customer Microservice (:8081) managing PERSONAL and BUSINESS customers, Peruvian identity document validation (DNI, RUC, CE, PASSPORT), Strategy pattern rules, and Soft Delete.",
+      "item": [
+        {
+          "name": "1. Create Personal Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"personalCustomerId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"personalDocNumber\", jsonData.documentNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create Business Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"businessCustomerId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"businessDocNumber\", jsonData.documentNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677889\",\n  \"businessName\": \"Inversiones Tecnologicas Peru S.A.C.\",\n  \"email\": \"contacto@invtec.pe\",\n  \"phoneNumber\": \"+5114455667\",\n  \"address\": \"Av. Rivera Navarrete 789, San Isidro\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. [Error 400] Create Business Customer with DNI (Strategy Validation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"79998887\",\n  \"businessName\": \"Empresa Invalida S.A.C.\",\n  \"email\": \"error@empresa.pe\",\n  \"phoneNumber\": \"+51999888777\",\n  \"address\": \"Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. [Error 409] Duplicate Document Number",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Otro\",\n  \"lastName\": \"Usuario\",\n  \"email\": \"otro@pivotbank.pe\",\n  \"phoneNumber\": \"+51911222333\",\n  \"address\": \"Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get All Customers (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get Customer by Document Number (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/document/{{personalDocNumber}}",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers",
+                "document",
+                "{{personalDocNumber}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Update Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Daniel Enrique\",\n  \"lastName\": \"Singer Rojas\",\n  \"email\": \"daniel.singer.updated@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Las Begonias 101, San Isidro\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Soft Delete Customer by ID (204 No Content)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Reactivate Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and status is ACTIVE\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql(\"ACTIVE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}/reactivate",
+              "host": [
+                "{{urlMsCustomer}}"
+              ],
+              "path": [
+                "customers",
+                "{{personalCustomerId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. ms-account",
+      "description": "Reactive Account Microservice (:8082) managing Passive Bank Products (SAVINGS, CHECKING, FIXED_TERM). Features AES-256-GCM encryption via HashiCorp Vault, SHA-256 blind indexing, Mask-on-Read presentation, and Soft Delete.",
+      "item": [
+        {
+          "name": "1. Open Personal SAVINGS Account (201 Created - Unmasked Once)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"savingsAccountId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"savingsAccountNumber\", jsonData.accountNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. [Error 400] Personal Customer Trying 2nd SAVINGS Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Open Business CHECKING Account with Holders & Signers (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"checkingAccountId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"checkingAccountNumber\", jsonData.accountNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. [Error 400] Business Customer Trying SAVINGS Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get All Bank Accounts (GET /accounts - Masked Numbers)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Account by ID (GET /accounts/{id} - Masked Number)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and number is masked\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().accountNumber).to.include(\"****\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{savingsAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get Account by Account Number (SHA-256 Blind Index Lookup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/number/{{savingsAccountNumber}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "number",
+                "{{savingsAccountNumber}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Accounts by Customer ID (GET /accounts/customer/{customerId})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/customer/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "customer",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Update Business Checking Account Holders (PUT /accounts/{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\",\n    \"88990011\"\n  ],\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{checkingAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Consult Available Balance (GET /accounts/{id}/balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}/balance",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{savingsAccountId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. [Error 400] Try Soft Delete on Checking Account While Balance > 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{checkingAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. Withdraw Full Checking Balance to 0.00 (PATCH /balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and balance is 0\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().balance).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"WITHDRAWAL\",\n  \"amount\": 10000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}/balance",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{checkingAccountId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13. Soft Delete (Close) Checking Account with Balance == 0 (204 No Content)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": [
+                "{{urlMsAccount}}"
+              ],
+              "path": [
+                "accounts",
+                "{{checkingAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. ms-credit",
+      "description": "Reactive Credit Microservice (:8083) managing Active Bank Products (PERSONAL_LOAN, BUSINESS_LOAN, PERSONAL_CREDIT_CARD, BUSINESS_CREDIT_CARD). Features Double Strategy Pattern, AES-256-GCM encryption via HashiCorp Vault, SHA-256 blind indexing, and Soft Delete.",
+      "item": [
+        {
+          "name": "1. Grant Personal Loan (POST /credits - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"personalLoanId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"personalLoanNumber\", jsonData.creditNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 5000.00,\n  \"paymentDueDay\": 15\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. [Error 400] Personal Customer Trying 2nd Active PERSONAL_LOAN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 3000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Issue Personal Credit Card (POST /credits - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"creditCardId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"creditCardNumber\", jsonData.creditNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000.00,\n  \"paymentDueDay\": 20\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Grant Business Loan #1 (POST /credits - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"businessLoanId\", jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"creditType\": \"BUSINESS_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 50000.00,\n  \"paymentDueDay\": 28\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Grant Business Loan #2 - Multiple Allowed (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"creditType\": \"BUSINESS_LOAN\",\n  \"currency\": \"USD\",\n  \"creditLimit\": 25000.00,\n  \"paymentDueDay\": 28\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. [Error 400] Business Customer Trying PERSONAL_LOAN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 10000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Retrieve All Credit Products (GET /credits - Masked Numbers)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Credit Product by ID (GET /credits/{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and number is masked\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().creditNumber).to.include(\"****\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{personalLoanId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{personalLoanId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Credit by Number (GET /credits/number/{creditNumber} - SHA-256 Blind Index)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/number/{{creditCardNumber}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "number",
+                "{{creditCardNumber}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Get All Credits by Customer ID (GET /credits/customer/{customerId})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/customer/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "customer",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. Update Credit Terms & Temporarily Block Card (PUT /credits/{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and status is BLOCKED\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql(\"BLOCKED\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000.00,\n  \"interestRate\": 29.90,\n  \"paymentDueDay\": 25,\n  \"status\": \"BLOCKED\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. [Error 400] Try Consumption While Credit Card is BLOCKED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"CONSUMPTION\",\n  \"amount\": 200.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}/balance",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13. Unblock Credit Card Back to ACTIVE (PUT /credits/{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and status is ACTIVE\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql(\"ACTIVE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000.00,\n  \"interestRate\": 29.90,\n  \"paymentDueDay\": 25,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14. Register Credit Card CONSUMPTION (PATCH /credits/{id}/balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"CONSUMPTION\",\n  \"amount\": 1500.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}/balance",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "15. Register Credit Card Partial PAYMENT (PATCH /credits/{id}/balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"PAYMENT\",\n  \"amount\": 500.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}/balance",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16. Consult Credit Card Available Line & Debt (GET /credits/{id}/balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{creditCardId}}/balance",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17. [Error 400] Try Soft Delete on Personal Loan with Debt > 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{personalLoanId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{personalLoanId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "18. Pay Off Full Personal Loan Debt -> Transitions to PAID_OFF (PATCH /balance)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and status is PAID_OFF\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql(\"PAID_OFF\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"PAYMENT\",\n  \"amount\": 5000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{personalLoanId}}/balance",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{personalLoanId}}",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "19. Soft Delete (Close) Paid-Off Loan with Debt == 0 (DELETE /credits/{id} - 204 No Content)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCredit}}/credits/{{personalLoanId}}",
+              "host": [
+                "{{urlMsCredit}}"
+              ],
+              "path": [
+                "credits",
+                "{{personalLoanId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. ms-transaction",
+      "description": "Immutable Financial Ledger & Transaction Orchestrator (:8084). Coordinates customer validation (:8081), account deposits/withdrawals (:8082), credit payments/consumptions (:8083), and compensating reversals via Template Method, Strategy, and Registry patterns.",
+      "item": [
+        {
+          "name": "1. Execute Account DEPOSIT (POST /transactions - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"depositTxId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"depositOpNumber\", jsonData.operationNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{savingsAccountId}}\",\n  \"transactionType\": \"DEPOSIT\",\n  \"currency\": \"PEN\",\n  \"amount\": 300.00,\n  \"description\": \"Ventanilla Cash Deposit - Agencia San Isidro\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Execute Account WITHDRAWAL (POST /transactions - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"withdrawalTxId\", jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{savingsAccountId}}\",\n  \"transactionType\": \"WITHDRAWAL\",\n  \"currency\": \"PEN\",\n  \"amount\": 100.00,\n  \"description\": \"ATM Withdrawal - Miraflores\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. [Error 400] Account Withdrawal Exceeding Available Balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{savingsAccountId}}\",\n  \"transactionType\": \"WITHDRAWAL\",\n  \"currency\": \"PEN\",\n  \"amount\": 999999.00,\n  \"description\": \"Attempted Overdraft Withdrawal\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Execute Credit Card CONSUMPTION (POST /transactions - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{creditCardId}}\",\n  \"transactionType\": \"CREDIT_CONSUMPTION\",\n  \"currency\": \"PEN\",\n  \"amount\": 450.00,\n  \"description\": \"POS Purchase - Electronics Store\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Execute Credit Card PAYMENT (POST /transactions - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{creditCardId}}\",\n  \"transactionType\": \"CREDIT_PAYMENT\",\n  \"currency\": \"PEN\",\n  \"amount\": 200.00,\n  \"description\": \"Monthly Credit Card Installment Payment\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Retrieve All Transactions (GET /transactions)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get Transaction by ID (GET /transactions/{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/{{depositTxId}}",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "{{depositTxId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Transaction by Operation Number (GET /transactions/operation/{opNumber})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/operation/{{depositOpNumber}}",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "operation",
+                "{{depositOpNumber}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get All Transactions by Customer ID (GET /transactions/customer/{customerId})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/customer/{{personalCustomerId}}",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "customer",
+                "{{personalCustomerId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Get All Movements of a Specific Product (GET /transactions/product/{targetProductId})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/product/{{savingsAccountId}}",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "product",
+                "{{savingsAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. Execute Compensating Reversal on Withdrawal (POST /transactions/{id}/reverse)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and referenceTransactionId is linked\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.referenceTransactionId).to.eql(pm.collectionVariables.get(\"withdrawalTxId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"ATM cash dispenser error - returning funds to customer account\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/{{withdrawalTxId}}/reverse",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "{{withdrawalTxId}}",
+                "reverse"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. [Error 400] Try to Reverse an Already REVERSED Transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Duplicate reversal attempt\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/{{withdrawalTxId}}/reverse",
+              "host": [
+                "{{urlMsTransaction}}"
+              ],
+              "path": [
+                "transactions",
+                "{{withdrawalTxId}}",
+                "reverse"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "urlMsConfig",
+      "value": "http://localhost:8888",
+      "type": "string",
+      "description": "[Infrastructure] Base URL for Spring Cloud Config Server (:8888)"
+    },
+    {
+      "key": "urlMsCustomer",
+      "value": "http://localhost:8081/api/v1",
+      "type": "string",
+      "description": "[Microservice] Base API URL for Customer Service (:8081)"
+    },
+    {
+      "key": "urlMsAccount",
+      "value": "http://localhost:8082/api/v1",
+      "type": "string",
+      "description": "[Microservice] Base API URL for Account Service (:8082)"
+    },
+    {
+      "key": "urlMsCredit",
+      "value": "http://localhost:8083/api/v1",
+      "type": "string",
+      "description": "[Microservice] Base API URL for Credit Service (:8083)"
+    },
+    {
+      "key": "urlMsTransaction",
+      "value": "http://localhost:8084/api/v1",
+      "type": "string",
+      "description": "[Microservice] Base API URL for Transaction Service (:8084)"
+    },
+    {
+      "key": "personalCustomerId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the created Personal Customer"
+    },
+    {
+      "key": "personalDocNumber",
+      "value": "71234567",
+      "type": "string",
+      "description": "[ms-customer] Identity document number (DNI) of the Personal Customer"
+    },
+    {
+      "key": "businessCustomerId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the created Business Customer"
+    },
+    {
+      "key": "businessDocNumber",
+      "value": "20556677889",
+      "type": "string",
+      "description": "[ms-customer] Tax identity number (RUC) of the Business Customer"
+    },
+    {
+      "key": "savingsAccountId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-account] Auto-populated MongoDB ID of the Personal SAVINGS account (used by ms-transaction)"
+    },
+    {
+      "key": "savingsAccountNumber",
+      "value": "",
+      "type": "string",
+      "description": "[ms-account] Auto-populated plain account number of the Personal SAVINGS account (for SHA-256 lookup)"
+    },
+    {
+      "key": "checkingAccountId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-account] Auto-populated MongoDB ID of the Business CHECKING account (used to test Soft Delete)"
+    },
+    {
+      "key": "checkingAccountNumber",
+      "value": "",
+      "type": "string",
+      "description": "[ms-account] Auto-populated plain account number of the Business CHECKING account"
+    },
+    {
+      "key": "personalLoanId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the Personal Loan"
+    },
+    {
+      "key": "personalLoanNumber",
+      "value": "",
+      "type": "string",
+      "description": "[ms-credit] Auto-populated plain contract number of the Personal Loan"
+    },
+    {
+      "key": "creditCardId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the Personal Credit Card (used by ms-transaction)"
+    },
+    {
+      "key": "creditCardNumber",
+      "value": "",
+      "type": "string",
+      "description": "[ms-credit] Auto-populated plain 16-digit number of the Personal Credit Card (for SHA-256 lookup)"
+    },
+    {
+      "key": "businessLoanId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the first Business Loan"
+    },
+    {
+      "key": "depositTxId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-transaction] Auto-populated MongoDB ID of the Account Deposit transaction"
+    },
+    {
+      "key": "depositOpNumber",
+      "value": "",
+      "type": "string",
+      "description": "[ms-transaction] Auto-populated banking operation code (OP-YYYYMMDD-XXXX) of the Deposit"
+    },
+    {
+      "key": "withdrawalTxId",
+      "value": "",
+      "type": "string",
+      "description": "[ms-transaction] Auto-populated MongoDB ID of the Account Withdrawal (used to test Compensating Reversal)"
+    }
+  ]
+}

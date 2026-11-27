@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-gateway
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-gateway
+  template:
+    metadata:
+      labels:
+        app: ms-gateway
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-gateway
+          image: pivot/ms-gateway:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-gateway
+  namespace: pivot-banking
+spec:
+  type: LoadBalancer
+  selector:
+    app: ms-gateway
+  ports:
+    - port: 8080
+      targetPort: 8080

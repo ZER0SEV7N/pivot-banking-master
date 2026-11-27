@@ -1,0 +1,2278 @@
+{
+  "info": {
+    "_postman_id": "7ef5acf9-553a-4c47-a570-e04eeb987da2",
+    "name": "Pivot Banking - Master Collection (Phase I & II)",
+    "description": "Master End-to-End Postman Collection for the Pivot Banking System (Phase I & Phase II).\n\nIncludes centralized variables, automated variable chaining, saved responses, and test assertions across all microservices:\n1. **ms-config (:8888):** Centralized configuration server.\n2. **ms-customer (:8081):** Personal & Business customer management (STANDARD, VIP, PYME profiles).\n3. **ms-account (:8082):** Passive bank products (Savings, Checking, Fixed-Term, VIP/PYME rules & automatic commissions).\n4. **ms-credit (:8083):** Active bank products (Personal/Business Loans & Credit Cards).\n5. **ms-transaction (:8084):** Immutable Financial Ledger, Inter-Account Transfers & Stream Reports.\n6. **ms-gateway (:8080):** Reactive API Gateway with Eureka Load Balancing, X-Correlation-Id & Resilience4j Circuit Breaker (2s timeout).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48827145"
+  },
+  "item": [
+    {
+      "name": "1. ms-config",
+      "item": [
+        {
+          "name": "1. Get ms-customer Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Config server returns propertySources\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property(\"propertySources\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-customer/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-customer", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-customer/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-customer", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-customer\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"label\": null,\n  \"version\": null,\n  \"state\": null,\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-customer.yml\",\n      \"source\": {\n        \"server.port\": 8081,\n        \"spring.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_customer}\",\n        \"spring.data.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_customer}\",\n        \"spring.data.mongodb.host\": \"localhost\",\n        \"spring.data.mongodb.port\": 27017,\n        \"spring.data.mongodb.database\": \"db_pivot_customer\",\n        \"eureka.client.service-url.defaultZone\": \"${EUREKA_URI:http://localhost:8761/eureka/}\",\n        \"logging.level.root\": \"INFO\",\n        \"logging.level.com.pe.pivot.customer\": \"DEBUG\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. Get ms-account Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-account/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-account", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-account/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-account", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-account\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"label\": null,\n  \"version\": null,\n  \"state\": null,\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-account.yml\",\n      \"source\": {\n        \"server.port\": 8082,\n        \"spring.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_account}\",\n        \"spring.data.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_account}\",\n        \"spring.data.mongodb.host\": \"localhost\",\n        \"spring.data.mongodb.port\": 27017,\n        \"spring.data.mongodb.database\": \"db_pivot_account\",\n        \"application.account-rules.checking-default-maintenance-fee\": \"${CHECKING_MAINTENANCE_FEE:15.00}\",\n        \"application.account-rules.savings-max-monthly-movements\": \"${SAVINGS_MAX_MOVEMENTS:5}\",\n        \"application.account-rules.vip-minimum-daily-average\": \"${VIP_MIN_DAILY_AVERAGE:500.00}\",\n        \"application.account-rules.max-free-monthly-transactions\": \"${MAX_FREE_TRANSACTIONS:3}\",\n        \"application.account-rules.default-transaction-commission\": \"${DEFAULT_TX_COMMISSION:5.00}\",\n        \"application.clients.customer-service.url\": \"${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}\",\n        \"application.clients.credit-service.url\": \"${CREDIT_SERVICE_URL:http://localhost:8083/api/v1/credits}\",\n        \"resilience4j.timelimiter.configs.default.timeoutDuration\": \"2s\",\n        \"logging.level.root\": \"INFO\",\n        \"logging.level.com.pe.pivot.account\": \"DEBUG\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. Get ms-credit Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-credit/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-credit", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-credit/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-credit", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-credit\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"label\": null,\n  \"version\": null,\n  \"state\": null,\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-credit.yml\",\n      \"source\": {\n        \"server.port\": 8083,\n        \"spring.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}\",\n        \"spring.data.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}\",\n        \"spring.data.mongodb.host\": \"localhost\",\n        \"spring.data.mongodb.port\": 27017,\n        \"spring.data.mongodb.database\": \"db_pivot_credit\",\n        \"application.credit-rules.default-personal-loan-rate\": \"${PERSONAL_LOAN_RATE:16.50}\",\n        \"application.credit-rules.default-business-loan-rate\": \"${BUSINESS_LOAN_RATE:12.00}\",\n        \"application.credit-rules.default-credit-card-rate\": \"${CREDIT_CARD_RATE:35.90}\",\n        \"application.credit-rules.default-payment-due-day\": \"${DEFAULT_PAYMENT_DUE_DAY:15}\",\n        \"application.clients.customer-service.url\": \"${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}\",\n        \"resilience4j.timelimiter.configs.default.timeoutDuration\": \"2s\",\n        \"logging.level.root\": \"INFO\",\n        \"logging.level.com.pe.pivot.credit\": \"DEBUG\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. Get ms-transaction Default Configuration (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-transaction/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-transaction", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-transaction/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-transaction", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-transaction\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"label\": null,\n  \"version\": null,\n  \"state\": null,\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-transaction.yml\",\n      \"source\": {\n        \"server.port\": 8084,\n        \"spring.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}\",\n        \"spring.data.mongodb.uri\": \"${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}\",\n        \"spring.data.mongodb.host\": \"localhost\",\n        \"spring.data.mongodb.port\": 27017,\n        \"spring.data.mongodb.database\": \"db_pivot_transaction\",\n        \"application.transaction-rules.operation-prefix\": \"${OPERATION_PREFIX:OP-}\",\n        \"application.transaction-rules.default-fee\": \"${DEFAULT_TRANSACTION_FEE:0.00}\",\n        \"application.clients.customer-service.url\": \"${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}\",\n        \"application.clients.account-service.url\": \"${ACCOUNT_SERVICE_URL:http://localhost:8082/api/v1/accounts}\",\n        \"application.clients.credit-service.url\": \"${CREDIT_SERVICE_URL:http://localhost:8083/api/v1/credits}\",\n        \"resilience4j.timelimiter.configs.default.timeoutDuration\": \"2s\",\n        \"logging.level.root\": \"INFO\",\n        \"logging.level.com.pe.pivot.transaction\": \"DEBUG\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "5. Get ms-eureka Default Configuration (Phase II - 200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-eureka/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-eureka", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-eureka/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-eureka", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-eureka\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-eureka.yml\",\n      \"source\": {\n        \"server.port\": 8761,\n        \"eureka.client.register-with-eureka\": false,\n        \"eureka.client.fetch-registry\": false\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "6. Get ms-gateway Default Configuration (Phase II - 200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsConfig}}/ms-gateway/default",
+              "host": ["{{urlMsConfig}}"],
+              "path": ["ms-gateway", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsConfig}}/ms-gateway/default",
+                  "host": ["{{urlMsConfig}}"],
+                  "path": ["ms-gateway", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"name\": \"ms-gateway\",\n  \"profiles\": [\n    \"default\"\n  ],\n  \"propertySources\": [\n    {\n      \"name\": \"classpath:/config-data/ms-gateway.yml\",\n      \"source\": {\n        \"server.port\": 8080,\n        \"resilience4j.timelimiter.configs.default.timeoutDuration\": \"2s\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Centralized Spring Cloud Config Server (:8888) serving externalized YAML configurations for all banking microservices."
+    },
+    {
+      "name": "2. ms-customer",
+      "item": [
+        {
+          "name": "1. Create Personal Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"personalCustomerId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"personalDocNumber\", jsonData.documentNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d78c0456645c2079513f\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"businessName\": null,\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:16.813282300Z\",\n  \"updatedAt\": \"2026-11-12T15:13:16.813282300Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. Create Business Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"businessCustomerId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"businessDocNumber\", jsonData.documentNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677889\",\n  \"businessName\": \"Inversiones Tecnologicas Peru S.A.C.\",\n  \"email\": \"contacto@invtec.pe\",\n  \"phoneNumber\": \"+5114455667\",\n  \"address\": \"Av. Rivera Navarrete 789, San Isidro\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677889\",\n  \"businessName\": \"Inversiones Tecnologicas Peru S.A.C.\",\n  \"email\": \"contacto@invtec.pe\",\n  \"phoneNumber\": \"+5114455667\",\n  \"address\": \"Av. Rivera Navarrete 789, San Isidro\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d7a00456645c20795140\",\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677889\",\n  \"firstName\": null,\n  \"lastName\": null,\n  \"businessName\": \"Inversiones Tecnologicas Peru S.A.C.\",\n  \"email\": \"contacto@invtec.pe\",\n  \"phoneNumber\": \"+5114455667\",\n  \"address\": \"Av. Rivera Navarrete 789, San Isidro\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:36.986831300Z\",\n  \"updatedAt\": \"2026-11-12T15:13:36.986831300Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. [Error 400] Create Business Customer with DNI (Strategy Validation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"79998887\",\n  \"businessName\": \"Empresa Invalida S.A.C.\",\n  \"email\": \"error@empresa.pe\",\n  \"phoneNumber\": \"+51999888777\",\n  \"address\": \"Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - Document Type",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"79998887\",\n  \"businessName\": \"Empresa Invalida S.A.C.\",\n  \"email\": \"error@empresa.pe\",\n  \"phoneNumber\": \"+51999888777\",\n  \"address\": \"Lima\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:13:54.000524900Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Business customers must be registered with a RUC document type.\",\n  \"path\": \"/api/v1/customers\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "3.B. [Error 400] Create Personal Customer with RUC (Strategy Validation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\n    pm.response.to.have.status(400);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677880\",\n  \"firstName\": \"user\",\n  \"lastName\": \"Invalid\",\n  \"email\": \"user@invalid.com\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - Document Type",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20556677880\",\n  \"firstName\": \"user\",\n  \"lastName\": \"Invalid\",\n  \"email\": \"user@invalid.com\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:16:36.528690500Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Personal customers cannot be registered with RUC document type.\",\n  \"path\": \"/api/v1/customers\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. [Error 409] Duplicate Document Number",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Otro\",\n  \"lastName\": \"Usuario\",\n  \"email\": \"otro@pivotbank.pe\",\n  \"phoneNumber\": \"+51911222333\",\n  \"address\": \"Lima\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "409 Conflict - Exists document",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Otro\",\n  \"lastName\": \"Usuario\",\n  \"email\": \"otro@pivotbank.pe\",\n  \"phoneNumber\": \"+51911222333\",\n  \"address\": \"Lima\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:17:11.974917600Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"A customer with the provided document number already exists.\",\n  \"path\": \"/api/v1/customers\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "5. Get All Customers (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6af5d78c0456645c2079513f\",\n    \"customerType\": \"PERSONAL\",\n    \"profile\": \"STANDARD\",\n    \"documentType\": \"DNI\",\n    \"documentNumber\": \"71234567\",\n    \"firstName\": \"Daniel\",\n    \"lastName\": \"Singer\",\n    \"businessName\": null,\n    \"email\": \"daniel.singer@pivotbank.pe\",\n    \"phoneNumber\": \"+51987654321\",\n    \"address\": \"Av. Javier Prado Este 456, Lima\",\n    \"status\": \"ACTIVE\",\n    \"createdAt\": \"2026-11-12T15:13:16.813Z\",\n    \"updatedAt\": \"2026-11-12T15:13:16.813Z\"\n  },\n  {\n    \"id\": \"6af5d7a00456645c20795140\",\n    \"customerType\": \"BUSINESS\",\n    \"profile\": \"STANDARD\",\n    \"documentType\": \"RUC\",\n    \"documentNumber\": \"20556677889\",\n    \"firstName\": null,\n    \"lastName\": null,\n    \"businessName\": \"Inversiones Tecnologicas Peru S.A.C.\",\n    \"email\": \"contacto@invtec.pe\",\n    \"phoneNumber\": \"+5114455667\",\n    \"address\": \"Av. Rivera Navarrete 789, San Isidro\",\n    \"status\": \"ACTIVE\",\n    \"createdAt\": \"2026-11-12T15:13:36.986Z\",\n    \"updatedAt\": \"2026-11-12T15:13:36.986Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "6. Get Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers", "{{personalCustomerId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers", "{{personalCustomerId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d78c0456645c2079513f\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"businessName\": null,\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:16.813Z\",\n  \"updatedAt\": \"2026-11-12T15:13:16.813Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "7. Get Customer by Document Number (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/document/{{personalDocNumber}}",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers", "document", "{{personalDocNumber}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers/document/{{personalDocNumber}}",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers", "document", "{{personalDocNumber}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d78c0456645c2079513f\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel\",\n  \"lastName\": \"Singer\",\n  \"businessName\": null,\n  \"email\": \"daniel.singer@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Javier Prado Este 456, Lima\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:16.813Z\",\n  \"updatedAt\": \"2026-11-12T15:13:16.813Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "8. Update Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Daniel Enrique\",\n  \"lastName\": \"Singer Rojas\",\n  \"email\": \"daniel.singer.updated@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Las Begonias 101, San Isidro\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers", "{{personalCustomerId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{personalDocNumber}}\",\n  \"firstName\": \"Daniel Enrique\",\n  \"lastName\": \"Singer Rojas\",\n  \"email\": \"daniel.singer.updated@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Las Begonias 101, San Isidro\",\n  \"status\": \"ACTIVE\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers", "{{personalCustomerId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d78c0456645c2079513f\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel Enrique\",\n  \"lastName\": \"Singer Rojas\",\n  \"businessName\": null,\n  \"email\": \"daniel.singer.updated@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Las Begonias 101, San Isidro\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:16.813Z\",\n  \"updatedAt\": \"2026-11-12T15:18:24.374087700Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "9. Soft Delete Customer by ID (204 No Content)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers", "{{personalCustomerId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers", "{{personalCustomerId}}"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "10. Reactivate Customer by ID (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and status is ACTIVE\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().status).to.eql(\"ACTIVE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}/reactivate",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers", "{{personalCustomerId}}", "reactivate"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers/{{personalCustomerId}}/reactivate",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers", "{{personalCustomerId}}", "reactivate"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d78c0456645c2079513f\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"STANDARD\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"71234567\",\n  \"firstName\": \"Daniel Enrique\",\n  \"lastName\": \"Singer Rojas\",\n  \"businessName\": null,\n  \"email\": \"daniel.singer.updated@pivotbank.pe\",\n  \"phoneNumber\": \"+51987654321\",\n  \"address\": \"Av. Las Begonias 101, San Isidro\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:13:16.813Z\",\n  \"updatedAt\": \"2026-11-12T15:19:08.787771500Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "11. [Phase II] Create VIP Personal Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created and profile is VIP\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.profile).to.eql(\"VIP\");",
+                  "    pm.collectionVariables.set(\"vipCustomerId\", json.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"74889900\",\n  \"firstName\": \"Valeria\",\n  \"lastName\": \"Mendoza\",\n  \"email\": \"valeria.mendoza.vip@pivotbank.pe\",\n  \"phoneNumber\": \"+51999111222\",\n  \"address\": \"Av. El Golf Los Incas 250, Surco\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - VIP Customer",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"74889900\",\n  \"firstName\": \"Valeria\",\n  \"lastName\": \"Mendoza\",\n  \"email\": \"valeria.mendoza.vip@pivotbank.pe\",\n  \"phoneNumber\": \"+51999111222\",\n  \"address\": \"Av. El Golf Los Incas 250, Surco\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af610100456645c20795150\",\n  \"customerType\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"74889900\",\n  \"firstName\": \"Valeria\",\n  \"lastName\": \"Mendoza\",\n  \"businessName\": null,\n  \"email\": \"valeria.mendoza.vip@pivotbank.pe\",\n  \"phoneNumber\": \"+51999111222\",\n  \"address\": \"Av. El Golf Los Incas 250, Surco\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-17T18:00:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "12. [Phase II] Create PYME Business Customer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created and profile is PYME\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.profile).to.eql(\"PYME\");",
+                  "    pm.collectionVariables.set(\"pymeCustomerId\", json.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20601122334\",\n  \"businessName\": \"Comercializadora Andina PYME S.A.C.\",\n  \"email\": \"finanzas@andinapyme.pe\",\n  \"phoneNumber\": \"+5113344556\",\n  \"address\": \"Jr. Gamarra 1240, La Victoria\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCustomer}}/customers",
+              "host": ["{{urlMsCustomer}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - PYME Customer",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20601122334\",\n  \"businessName\": \"Comercializadora Andina PYME S.A.C.\",\n  \"email\": \"finanzas@andinapyme.pe\",\n  \"phoneNumber\": \"+5113344556\",\n  \"address\": \"Jr. Gamarra 1240, La Victoria\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCustomer}}/customers",
+                  "host": ["{{urlMsCustomer}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af610250456645c20795151\",\n  \"customerType\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20601122334\",\n  \"firstName\": null,\n  \"lastName\": null,\n  \"businessName\": \"Comercializadora Andina PYME S.A.C.\",\n  \"email\": \"finanzas@andinapyme.pe\",\n  \"phoneNumber\": \"+5113344556\",\n  \"address\": \"Jr. Gamarra 1240, La Victoria\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-17T18:01:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:01:00.000Z\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Reactive Customer Microservice (:8081) managing PERSONAL and BUSINESS customers, Peruvian identity document validation (DNI, RUC, CE, PASSPORT), STANDARD/VIP/PYME profiles, Strategy pattern rules, and Soft Delete."
+    },
+    {
+      "name": "3. ms-account",
+      "item": [
+        {
+          "name": "1. Open Personal SAVINGS Account (201 Created - Unmasked Once)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"savingsAccountId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"savingsAccountNumber\", jsonData.accountNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d9018cef08ae8f651648\",\n  \"accountNumber\": \"191-8A6E682A-0-01\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500,\n  \"maintenanceFee\": 0,\n  \"minimumDailyAverage\": 0,\n  \"minOpeningAmount\": 0,\n  \"maxMonthlyMovements\": 5,\n  \"maxFreeMonthlyTransactions\": 3,\n  \"transactionCommissionFee\": 5,\n  \"lastAppliedCommission\": 0,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:19:29.350730500Z\",\n  \"updatedAt\": \"2026-11-12T15:19:29.350730500Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. [Error 400] Personal Customer Trying 2nd SAVINGS Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - BusinessException",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 100.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:20:06.705735400Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Personal customers can only own a maximum of one active SAVINGS account.\",\n  \"path\": \"/api/v1/accounts\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. Open Business CHECKING Account with Holders & Signers (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"checkingAccountId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"checkingAccountNumber\", jsonData.accountNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\"\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d93e8cef08ae8f651649\",\n  \"accountNumber\": \"191-52A82955-0-01\",\n  \"customerId\": \"6af5d7a00456645c20795140\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000,\n  \"maintenanceFee\": 15,\n  \"minimumDailyAverage\": 0,\n  \"minOpeningAmount\": 0,\n  \"maxMonthlyMovements\": null,\n  \"maxFreeMonthlyTransactions\": 3,\n  \"transactionCommissionFee\": 5,\n  \"lastAppliedCommission\": 0,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\"\n  ],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:20:30.282593300Z\",\n  \"updatedAt\": \"2026-11-12T15:20:30.282593300Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. [Error 400] Business Customer Trying SAVINGS Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - BusinessException",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:20:57.946034400Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Business customers are not allowed to open SAVINGS or FIXED_TERM accounts. Only CHECKING accounts are permitted.\",\n  \"path\": \"/api/v1/accounts\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "5. Get All Bank Accounts (GET /accounts - Masked Numbers)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Before Transaction",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6af5d9018cef08ae8f651648\",\n    \"accountNumber\": \"*************0-01\",\n    \"customerId\": \"6af5d78c0456645c2079513f\",\n    \"accountType\": \"SAVINGS\",\n    \"currency\": \"PEN\",\n    \"balance\": 500,\n    \"maintenanceFee\": 0,\n    \"maxMonthlyMovements\": 5,\n    \"currentMonthlyMovements\": 0,\n    \"allowedMovementDay\": null,\n    \"holders\": [\n      \"71234567\"\n    ],\n    \"authorizedSigners\": [],\n    \"status\": \"ACTIVE\",\n    \"createdAt\": \"2026-11-12T15:19:29.350Z\",\n    \"updatedAt\": \"2026-11-12T15:19:29.350Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "6. Get Account by ID (GET /accounts/{id} - Masked Number)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{savingsAccountId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{savingsAccountId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d9018cef08ae8f651648\",\n  \"accountNumber\": \"*************0-01\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500,\n  \"maintenanceFee\": 0,\n  \"maxMonthlyMovements\": 5,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:19:29.350Z\",\n  \"updatedAt\": \"2026-11-12T15:19:29.350Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "7. Get Account by Account Number (SHA-256 Blind Index Lookup)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/number/{{savingsAccountNumber}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "number", "{{savingsAccountNumber}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/number/{{savingsAccountNumber}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "number", "{{savingsAccountNumber}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d9018cef08ae8f651648\",\n  \"accountNumber\": \"*************0-01\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 500,\n  \"maintenanceFee\": 0,\n  \"maxMonthlyMovements\": 5,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:19:29.350Z\",\n  \"updatedAt\": \"2026-11-12T15:19:29.350Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "8. Get Accounts by Customer ID (GET /accounts/customer/{customerId})",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/customer/{{personalCustomerId}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "customer", "{{personalCustomerId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/customer/{{personalCustomerId}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "customer", "{{personalCustomerId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6af5d9018cef08ae8f651648\",\n    \"accountNumber\": \"*************0-01\",\n    \"customerId\": \"6af5d78c0456645c2079513f\",\n    \"accountType\": \"SAVINGS\",\n    \"currency\": \"PEN\",\n    \"balance\": 500,\n    \"maintenanceFee\": 0,\n    \"maxMonthlyMovements\": 5,\n    \"currentMonthlyMovements\": 0,\n    \"allowedMovementDay\": null,\n    \"holders\": [\n      \"71234567\"\n    ],\n    \"authorizedSigners\": [],\n    \"status\": \"ACTIVE\",\n    \"createdAt\": \"2026-11-12T15:19:29.350Z\",\n    \"updatedAt\": \"2026-11-12T15:19:29.350Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "9. Update Business Checking Account Holders (PUT /accounts/{id})",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\",\n    \"88990011\"\n  ],\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{checkingAccountId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000.00,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\",\n    \"88990011\"\n  ],\n  \"status\": \"ACTIVE\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{checkingAccountId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5d93e8cef08ae8f651649\",\n  \"accountNumber\": \"*************0-01\",\n  \"customerId\": \"6af5d7a00456645c20795140\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 10000,\n  \"maintenanceFee\": 15,\n  \"maxMonthlyMovements\": null,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\",\n    \"88990011\"\n  ],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:20:30.282Z\",\n  \"updatedAt\": \"2026-11-12T15:27:57.855232800Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "10. Consult Available Balance (GET /accounts/{id}/balance)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}/balance",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{savingsAccountId}}", "balance"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{savingsAccountId}}/balance",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{savingsAccountId}}", "balance"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"accountId\": \"6af5d9018cef08ae8f651648\",\n  \"accountNumber\": \"*************0-01\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"availableBalance\": 500,\n  \"currentMonthlyMovements\": 0,\n  \"maxMonthlyMovements\": 5,\n  \"queriedAt\": \"2026-11-12T15:28:41.966090300Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "11. [Error 400] Try Soft Delete on Checking Account While Balance > 0",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{checkingAccountId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - Only 0 balance can be Delete",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{checkingAccountId}}"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:29:13.305605800Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Cannot close a bank account with remaining balance (10000.00). Please withdraw all funds first.\",\n  \"path\": \"/api/v1/accounts/6af5d93e8cef08ae8f651649\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "12. Withdraw Full Checking Balance to 0.00 (PATCH /balance)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationType\": \"WITHDRAWAL\",\n  \"amount\": 10000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}/balance",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{checkingAccountId}}", "balance"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"operationType\": \"WITHDRAWAL\",\n  \"amount\": 10000.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}/balance",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{checkingAccountId}}", "balance"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5dc378cef08ae8f65164a\",\n  \"accountNumber\": \"*************0-01\",\n  \"customerId\": \"6af5dbbf0456645c20795141\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 0,\n  \"maintenanceFee\": 15,\n  \"maxMonthlyMovements\": null,\n  \"currentMonthlyMovements\": 1,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"20556677889\",\n    \"71234567\"\n  ],\n  \"authorizedSigners\": [\n    \"44556677\"\n  ],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:33:11.964Z\",\n  \"updatedAt\": \"2026-11-12T15:33:22.758385200Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "13. Soft Delete (Close) Checking Account with Balance == 0 (204 No Content)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts", "{{checkingAccountId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts/{{checkingAccountId}}",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts", "{{checkingAccountId}}"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "14. [Phase II - Error 400] VIP Customer Trying SAVINGS Account Without Credit Card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request when VIP lacks active credit card\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 1000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - Missing Active Credit Card",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 1000.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-17T18:05:00.000Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"VIP Personal customers must hold an active Credit Card with the bank to open a VIP SAVINGS account.\",\n  \"path\": \"/api/v1/accounts\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "15. [Phase II] Open VIP SAVINGS Account (201 Created - Minimum Daily Average = 500.00)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created and minimumDailyAverage is 500\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.minimumDailyAverage).to.eql(500);",
+                  "    pm.collectionVariables.set(\"vipSavingsAccountId\", json.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 1000.00,\n  \"maxFreeMonthlyTransactions\": 1,\n  \"transactionCommissionFee\": 5.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - VIP Savings Account",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 1000.00,\n  \"maxFreeMonthlyTransactions\": 1,\n  \"transactionCommissionFee\": 5.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af611008cef08ae8f651655\",\n  \"accountNumber\": \"191-VIP99881-0-01\",\n  \"customerId\": \"6af610100456645c20795150\",\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"PEN\",\n  \"balance\": 1000,\n  \"maintenanceFee\": 0,\n  \"minimumDailyAverage\": 500,\n  \"minOpeningAmount\": 500,\n  \"maxMonthlyMovements\": 5,\n  \"maxFreeMonthlyTransactions\": 1,\n  \"transactionCommissionFee\": 5,\n  \"lastAppliedCommission\": 0,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"74889900\"\n  ],\n  \"authorizedSigners\": [],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-17T18:10:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:10:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "16. [Phase II] Open PYME CHECKING Account (201 Created - Maintenance Fee = 0.00)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created and PYME maintenanceFee is 0\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.maintenanceFee).to.eql(0);",
+                  "    pm.collectionVariables.set(\"pymeCheckingAccountId\", json.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000.00,\n  \"holders\": [\n    \"20601122334\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{urlMsAccount}}/accounts",
+              "host": ["{{urlMsAccount}}"],
+              "path": ["accounts"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - PYME Commission-Free Checking Account",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000.00,\n  \"holders\": [\n    \"20601122334\"\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsAccount}}/accounts",
+                  "host": ["{{urlMsAccount}}"],
+                  "path": ["accounts"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af611208cef08ae8f651656\",\n  \"accountNumber\": \"191-PYME7721-0-01\",\n  \"customerId\": \"6af610250456645c20795151\",\n  \"accountType\": \"CHECKING\",\n  \"currency\": \"PEN\",\n  \"balance\": 5000,\n  \"maintenanceFee\": 0,\n  \"minimumDailyAverage\": 0,\n  \"minOpeningAmount\": 0,\n  \"maxMonthlyMovements\": null,\n  \"maxFreeMonthlyTransactions\": 3,\n  \"transactionCommissionFee\": 5,\n  \"lastAppliedCommission\": 0,\n  \"currentMonthlyMovements\": 0,\n  \"allowedMovementDay\": null,\n  \"holders\": [\n    \"20601122334\"\n  ],\n  \"authorizedSigners\": [],\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-17T18:12:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:12:00.000Z\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Reactive Account Microservice (:8082) managing Passive Bank Products (SAVINGS, CHECKING, FIXED_TERM) with Phase II VIP/PYME rules, minimum opening amounts, and automatic commission fees."
+    },
+    {
+      "name": "4. ms-credit",
+      "item": [
+        {
+          "name": "1. Grant Personal Loan (POST /credits - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"personalLoanId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"personalLoanNumber\", jsonData.creditNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 5000.00,\n  \"paymentDueDay\": 15\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": ["{{urlMsCredit}}"],
+              "path": ["credits"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 5000.00,\n  \"paymentDueDay\": 15\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCredit}}/credits",
+                  "host": ["{{urlMsCredit}}"],
+                  "path": ["credits"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5de8c0040b30a400dcc19\",\n  \"creditNumber\": \"LN-0F5BD731\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 5000,\n  \"usedAmount\": 5000,\n  \"availableAmount\": 0,\n  \"interestRate\": 16.5,\n  \"paymentDueDay\": 15,\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:43:08.517305500Z\",\n  \"updatedAt\": \"2026-11-12T15:43:08.517305500Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. [Error 400] Personal Customer Trying 2nd Active PERSONAL_LOAN",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 3000.00\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": ["{{urlMsCredit}}"],
+              "path": ["credits"]
+            }
+          },
+          "response": [
+            {
+              "name": "400 Bad Request - Business Exception",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_LOAN\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 3000.00\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCredit}}/credits",
+                  "host": ["{{urlMsCredit}}"],
+                  "path": ["credits"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-12T15:43:24.842883600Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Personal customers are only allowed to hold one active PERSONAL_LOAN at a time.\",\n  \"path\": \"/api/v1/credits\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. Issue Personal Credit Card (POST /credits - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"creditCardId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"creditCardNumber\", jsonData.creditNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000.00,\n  \"paymentDueDay\": 20\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": ["{{urlMsCredit}}"],
+              "path": ["credits"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000.00,\n  \"paymentDueDay\": 20\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCredit}}/credits",
+                  "host": ["{{urlMsCredit}}"],
+                  "path": ["credits"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5deb60040b30a400dcc1a\",\n  \"creditNumber\": \"4557-8800-A5F862AC\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 8000,\n  \"usedAmount\": 0,\n  \"availableAmount\": 8000,\n  \"interestRate\": 35.9,\n  \"paymentDueDay\": 20,\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-12T15:43:50.359667800Z\",\n  \"updatedAt\": \"2026-11-12T15:43:50.359667800Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. [Phase II] Issue Credit Card to VIP Customer & PYME Customer (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 15000.00,\n  \"paymentDueDay\": 20\n}"
+            },
+            "url": {
+              "raw": "{{urlMsCredit}}/credits",
+              "host": ["{{urlMsCredit}}"],
+              "path": ["credits"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - Active Card for VIP Eligibility",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 15000.00,\n  \"paymentDueDay\": 20\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsCredit}}/credits",
+                  "host": ["{{urlMsCredit}}"],
+                  "path": ["credits"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af610900040b30a400dcc25\",\n  \"creditNumber\": \"4557-8800-99112233\",\n  \"customerId\": \"6af610100456645c20795150\",\n  \"creditType\": \"PERSONAL_CREDIT_CARD\",\n  \"currency\": \"PEN\",\n  \"creditLimit\": 15000,\n  \"usedAmount\": 0,\n  \"availableAmount\": 15000,\n  \"interestRate\": 35.9,\n  \"paymentDueDay\": 20,\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2026-11-17T18:08:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:08:00.000Z\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Reactive Credit Microservice (:8083) managing Active Bank Products (PERSONAL_LOAN, BUSINESS_LOAN, PERSONAL_CREDIT_CARD, BUSINESS_CREDIT_CARD)."
+    },
+    {
+      "name": "5. ms-transaction",
+      "item": [
+        {
+          "name": "1. Execute Account DEPOSIT (POST /transactions - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"depositTxId\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"depositOpNumber\", jsonData.operationNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{savingsAccountId}}\",\n  \"transactionType\": \"DEPOSIT\",\n  \"currency\": \"PEN\",\n  \"amount\": 300.00,\n  \"description\": \"Ventanilla Cash Deposit - Agencia San Isidro\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions",
+              "host": ["{{urlMsTransaction}}"],
+              "path": ["transactions"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{personalCustomerId}}\",\n  \"targetProductId\": \"{{savingsAccountId}}\",\n  \"transactionType\": \"DEPOSIT\",\n  \"currency\": \"PEN\",\n  \"amount\": 300.00,\n  \"description\": \"Ventanilla Cash Deposit - Agencia San Isidro\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsTransaction}}/transactions",
+                  "host": ["{{urlMsTransaction}}"],
+                  "path": ["transactions"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af5e45e844fd1d038032a70\",\n  \"operationNumber\": \"OP-20261112-8A879CF8\",\n  \"customerId\": \"6af5d78c0456645c2079513f\",\n  \"targetProductId\": \"6af5d9018cef08ae8f651648\",\n  \"maskedProductNumber\": \"*************0-01\",\n  \"productCategory\": \"BANK_ACCOUNT\",\n  \"transactionType\": \"DEPOSIT\",\n  \"currency\": \"PEN\",\n  \"amount\": 300,\n  \"fee\": 0,\n  \"previousBalance\": 500,\n  \"newBalance\": 800,\n  \"description\": \"Ventanilla Cash Deposit - Agencia San Isidro\",\n  \"referenceTransactionId\": null,\n  \"status\": \"COMPLETED\",\n  \"createdAt\": \"2026-11-12T16:07:58.322932500Z\",\n  \"updatedAt\": \"2026-11-12T16:07:58.322932500Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. [Phase II] Execute Inter-Account Bank Transfer (POST /transactions/transfer - 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created and type is TRANSFER_OUT\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.expect(pm.response.json().transactionType).to.eql(\"TRANSFER_OUT\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"sourceAccountId\": \"{{vipSavingsAccountId}}\",\n  \"destinationAccountId\": \"{{pymeCheckingAccountId}}\",\n  \"currency\": \"PEN\",\n  \"amount\": 250.00,\n  \"description\": \"Inter-account bank transfer to PYME supplier\"\n}"
+            },
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/transfer",
+              "host": ["{{urlMsTransaction}}"],
+              "path": ["transactions", "transfer"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Created - Bank Transfer with Automatic Commission (5.00)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"sourceAccountId\": \"{{vipSavingsAccountId}}\",\n  \"destinationAccountId\": \"{{pymeCheckingAccountId}}\",\n  \"currency\": \"PEN\",\n  \"amount\": 250.00,\n  \"description\": \"Inter-account bank transfer to PYME supplier\"\n}"
+                },
+                "url": {
+                  "raw": "{{urlMsTransaction}}/transactions/transfer",
+                  "host": ["{{urlMsTransaction}}"],
+                  "path": ["transactions", "transfer"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6af61200844fd1d038032a80\",\n  \"operationNumber\": \"OP-20261117-99A812BC\",\n  \"customerId\": \"6af610100456645c20795150\",\n  \"targetProductId\": \"6af611008cef08ae8f651655\",\n  \"maskedProductNumber\": \"*************0-01\",\n  \"productCategory\": \"BANK_ACCOUNT\",\n  \"transactionType\": \"TRANSFER_OUT\",\n  \"currency\": \"PEN\",\n  \"amount\": 250,\n  \"fee\": 5,\n  \"previousBalance\": 1200,\n  \"newBalance\": 945,\n  \"description\": \"Inter-account bank transfer to PYME supplier\",\n  \"referenceTransactionId\": null,\n  \"status\": \"COMPLETED\",\n  \"createdAt\": \"2026-11-17T18:20:00.000Z\",\n  \"updatedAt\": \"2026-11-17T18:20:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. [Phase II - Report #1] Generate Product Report by Date Range (GET /reports/product/{id})",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/reports/product/{{savingsAccountId}}?startDate=2025-01-01T00:00:00Z&endDate=2027-12-31T23:59:59Z",
+              "host": ["{{urlMsTransaction}}"],
+              "path": ["transactions", "reports", "product", "{{savingsAccountId}}"],
+              "query": [
+                { "key": "startDate", "value": "2025-01-01T00:00:00Z" },
+                { "key": "endDate", "value": "2027-12-31T23:59:59Z" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Consolidated Date-Range Product Report",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsTransaction}}/transactions/reports/product/{{savingsAccountId}}?startDate=2025-01-01T00:00:00Z&endDate=2027-12-31T23:59:59Z",
+                  "host": ["{{urlMsTransaction}}"],
+                  "path": ["transactions", "reports", "product", "{{savingsAccountId}}"],
+                  "query": [
+                    { "key": "startDate", "value": "2025-01-01T00:00:00Z" },
+                    { "key": "endDate", "value": "2027-12-31T23:59:59Z" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"productId\": \"6af5d9018cef08ae8f651648\",\n  \"maskedProductNumber\": \"*************0-01\",\n  \"productCategory\": \"BANK_ACCOUNT\",\n  \"currency\": \"PEN\",\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2027-12-31T23:59:59Z\",\n  \"totalTransactions\": 2,\n  \"totalTransactedAmount\": 400,\n  \"totalFeesCollected\": 0,\n  \"movements\": [\n    {\n      \"id\": \"6af5e4e2844fd1d038032a71\",\n      \"operationNumber\": \"OP-20261112-E2763DC5\",\n      \"customerId\": \"6af5d78c0456645c2079513f\",\n      \"targetProductId\": \"6af5d9018cef08ae8f651648\",\n      \"maskedProductNumber\": \"*************0-01\",\n      \"productCategory\": \"BANK_ACCOUNT\",\n      \"transactionType\": \"WITHDRAWAL\",\n      \"currency\": \"PEN\",\n      \"amount\": 100,\n      \"fee\": 0,\n      \"previousBalance\": 800,\n      \"newBalance\": 700,\n      \"description\": \"ATM Withdrawal - Miraflores\",\n      \"referenceTransactionId\": null,\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"2026-11-12T16:10:10.743Z\",\n      \"updatedAt\": \"2026-11-12T16:10:10.743Z\"\n    },\n    {\n      \"id\": \"6af5e45e844fd1d038032a70\",\n      \"operationNumber\": \"OP-20261112-8A879CF8\",\n      \"customerId\": \"6af5d78c0456645c2079513f\",\n      \"targetProductId\": \"6af5d9018cef08ae8f651648\",\n      \"maskedProductNumber\": \"*************0-01\",\n      \"productCategory\": \"BANK_ACCOUNT\",\n      \"transactionType\": \"DEPOSIT\",\n      \"currency\": \"PEN\",\n      \"amount\": 300,\n      \"fee\": 0,\n      \"previousBalance\": 500,\n      \"newBalance\": 800,\n      \"description\": \"Ventanilla Cash Deposit - Agencia San Isidro\",\n      \"referenceTransactionId\": null,\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"2026-11-12T16:07:58.322Z\",\n      \"updatedAt\": \"2026-11-12T16:07:58.322Z\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. [Phase II - Report #2] Get Last 10 Movements of Credit Card (GET /reports/card/{id}/last-movements)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{urlMsTransaction}}/transactions/reports/card/{{creditCardId}}/last-movements",
+              "host": ["{{urlMsTransaction}}"],
+              "path": ["transactions", "reports", "card", "{{creditCardId}}", "last-movements"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Last 10 Card Movements",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{urlMsTransaction}}/transactions/reports/card/{{creditCardId}}/last-movements",
+                  "host": ["{{urlMsTransaction}}"],
+                  "path": ["transactions", "reports", "card", "{{creditCardId}}", "last-movements"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6af5e5f1844fd1d038032a73\",\n    \"operationNumber\": \"OP-20261112-EBCBB49F\",\n    \"customerId\": \"6af5d78c0456645c2079513f\",\n    \"targetProductId\": \"6af5deb60040b30a400dcc1a\",\n    \"maskedProductNumber\": \"**************62AC\",\n    \"productCategory\": \"CREDIT_PRODUCT\",\n    \"transactionType\": \"CREDIT_PAYMENT\",\n    \"currency\": \"PEN\",\n    \"amount\": 200,\n    \"fee\": 0,\n    \"previousBalance\": 1450,\n    \"newBalance\": 1250,\n    \"description\": \"Monthly Credit Card Installment Payment\",\n    \"referenceTransactionId\": null,\n    \"status\": \"COMPLETED\",\n    \"createdAt\": \"2026-11-12T16:14:41.647Z\",\n    \"updatedAt\": \"2026-11-12T16:14:41.647Z\"\n  },\n  {\n    \"id\": \"6af5e54c844fd1d038032a72\",\n    \"operationNumber\": \"OP-20261112-479D0C2C\",\n    \"customerId\": \"6af5d78c0456645c2079513f\",\n    \"targetProductId\": \"6af5deb60040b30a400dcc1a\",\n    \"maskedProductNumber\": \"**************62AC\",\n    \"productCategory\": \"CREDIT_PRODUCT\",\n    \"transactionType\": \"CREDIT_CONSUMPTION\",\n    \"currency\": \"PEN\",\n    \"amount\": 450,\n    \"fee\": 0,\n    \"previousBalance\": 1000,\n    \"newBalance\": 1450,\n    \"description\": \"POS Purchase - Electronics Store\",\n    \"referenceTransactionId\": null,\n    \"status\": \"COMPLETED\",\n    \"createdAt\": \"2026-11-12T16:11:56.849Z\",\n    \"updatedAt\": \"2026-11-12T16:11:56.849Z\"\n  }\n]"
+            }
+          ]
+        }
+      ],
+      "description": "Immutable Financial Ledger & Transaction Orchestrator (:8084). Coordinates deposits, withdrawals, credit operations, inter-account transfers, compensating reversals, and Java Streams reports."
+    },
+    {
+      "name": "6. ms-gateway (:8080)",
+      "item": [
+        {
+          "name": "1. Route Request via API Gateway with X-Correlation-Id (GET /api/v1/customers)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK and X-Correlation-Id header is returned\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.have.header(\"X-Correlation-Id\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Correlation-Id",
+                "value": "corr-pivot-2026-0001"
+              }
+            ],
+            "url": {
+              "raw": "{{urlMsGateway}}/customers",
+              "host": ["{{urlMsGateway}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Routed via Eureka with X-Correlation-Id",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{ "key": "X-Correlation-Id", "value": "corr-pivot-2026-0001" }],
+                "url": {
+                  "raw": "{{urlMsGateway}}/customers",
+                  "host": ["{{urlMsGateway}}"],
+                  "path": ["customers"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                { "key": "Content-Type", "value": "application/json" },
+                { "key": "X-Correlation-Id", "value": "corr-pivot-2026-0001" }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6af5d78c0456645c2079513f\",\n    \"customerType\": \"PERSONAL\",\n    \"profile\": \"STANDARD\",\n    \"documentType\": \"DNI\",\n    \"documentNumber\": \"****4567\",\n    \"firstName\": \"Daniel Enrique\",\n    \"lastName\": \"Singer Rojas\",\n    \"businessName\": null,\n    \"email\": \"daniel.singer.updated@pivotbank.pe\",\n    \"phoneNumber\": \"+51987654321\",\n    \"address\": \"Av. Las Begonias 101, San Isidro\",\n    \"status\": \"ACTIVE\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "2. [Fallback 503] Circuit Breaker Triggered When Downstream Exceeds 2s Timeout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/fallback/ms-account",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["fallback", "ms-account"]
+            }
+          },
+          "response": [
+            {
+              "name": "503 Service Unavailable - Resilience4j Fallback",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/fallback/ms-account",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["fallback", "ms-account"]
+                }
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-11-17T18:30:00.000Z\",\n  \"status\": 503,\n  \"error\": \"Service Unavailable (Circuit Breaker Triggered)\",\n  \"message\": \"Downstream microservice [ms-account] did not respond within the 2-second timeout or is currently unavailable.\",\n  \"path\": \"/fallback/ms-account\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Reactive API Gateway (:8080) with Eureka Service Discovery, X-Correlation-Id propagation, and Resilience4j Circuit Breaker (2-second timeout)."
+    }
+  ],
+  "variable": [
+    {
+      "key": "urlMsConfig",
+      "value": "http://localhost:8888",
+      "description": "[Infrastructure] Base URL for Spring Cloud Config Server (:8888)"
+    },
+    {
+      "key": "urlMsGateway",
+      "value": "http://localhost:8080/api/v1",
+      "description": "[Infrastructure] Base API URL for Spring Cloud Gateway (:8080)"
+    },
+    {
+      "key": "urlMsCustomer",
+      "value": "http://localhost:8081/api/v1",
+      "description": "[Microservice] Base API URL for Customer Service (:8081)"
+    },
+    {
+      "key": "urlMsAccount",
+      "value": "http://localhost:8082/api/v1",
+      "description": "[Microservice] Base API URL for Account Service (:8082)"
+    },
+    {
+      "key": "urlMsCredit",
+      "value": "http://localhost:8083/api/v1",
+      "description": "[Microservice] Base API URL for Credit Service (:8083)"
+    },
+    {
+      "key": "urlMsTransaction",
+      "value": "http://localhost:8084/api/v1",
+      "description": "[Microservice] Base API URL for Transaction Service (:8084)"
+    },
+    {
+      "key": "personalCustomerId",
+      "value": "",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the created Personal Customer"
+    },
+    {
+      "key": "personalDocNumber",
+      "value": "71234567",
+      "description": "[ms-customer] Identity document number (DNI) of the Personal Customer"
+    },
+    {
+      "key": "businessCustomerId",
+      "value": "",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the created Business Customer"
+    },
+    {
+      "key": "businessDocNumber",
+      "value": "20556677889",
+      "description": "[ms-customer] Tax identity number (RUC) of the Business Customer"
+    },
+    {
+      "key": "vipCustomerId",
+      "value": "",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the VIP Personal Customer"
+    },
+    {
+      "key": "pymeCustomerId",
+      "value": "",
+      "description": "[ms-customer] Auto-populated MongoDB ID of the PYME Business Customer"
+    },
+    {
+      "key": "savingsAccountId",
+      "value": "",
+      "description": "[ms-account] Auto-populated MongoDB ID of the Personal SAVINGS account"
+    },
+    {
+      "key": "savingsAccountNumber",
+      "value": "",
+      "description": "[ms-account] Auto-populated plain account number of the Personal SAVINGS account"
+    },
+    {
+      "key": "checkingAccountId",
+      "value": "",
+      "description": "[ms-account] Auto-populated MongoDB ID of the Business CHECKING account"
+    },
+    {
+      "key": "checkingAccountNumber",
+      "value": "",
+      "description": "[ms-account] Auto-populated plain account number of the Business CHECKING account"
+    },
+    {
+      "key": "vipSavingsAccountId",
+      "value": "",
+      "description": "[ms-account] Auto-populated MongoDB ID of the VIP SAVINGS account"
+    },
+    {
+      "key": "pymeCheckingAccountId",
+      "value": "",
+      "description": "[ms-account] Auto-populated MongoDB ID of the PYME CHECKING account"
+    },
+    {
+      "key": "personalLoanId",
+      "value": "",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the Personal Loan"
+    },
+    {
+      "key": "personalLoanNumber",
+      "value": "",
+      "description": "[ms-credit] Auto-populated plain contract number of the Personal Loan"
+    },
+    {
+      "key": "creditCardId",
+      "value": "",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the Personal Credit Card"
+    },
+    {
+      "key": "creditCardNumber",
+      "value": "",
+      "description": "[ms-credit] Auto-populated plain 16-digit number of the Personal Credit Card"
+    },
+    {
+      "key": "businessLoanId",
+      "value": "",
+      "description": "[ms-credit] Auto-populated MongoDB ID of the first Business Loan"
+    },
+    {
+      "key": "depositTxId",
+      "value": "",
+      "description": "[ms-transaction] Auto-populated MongoDB ID of the Account Deposit transaction"
+    },
+    {
+      "key": "depositOpNumber",
+      "value": "",
+      "description": "[ms-transaction] Auto-populated banking operation code (OP-YYYYMMDD-XXXX) of the Deposit"
+    },
+    {
+      "key": "withdrawalTxId",
+      "value": "",
+      "description": "[ms-transaction] Auto-populated MongoDB ID of the Account Withdrawal"
+    }
+  ]
+}

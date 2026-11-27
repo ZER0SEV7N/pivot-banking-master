@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: pivot-banking
+data:
+  datasources.yml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://pivot-loki:3100
+        isDefault: true
+        editable: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-loki
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-loki
+  template:
+    metadata:
+      labels:
+        app: pivot-loki
+    spec:
+      containers:
+        - name: loki
+          image: grafana/loki:3.0.0
+          args:
+            - "-config.file=/etc/loki/local-config.yaml"
+          ports:
+            - containerPort: 3100
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-loki
+  namespace: pivot-banking
+spec:
+  selector:
+    app: pivot-loki
+  ports:
+    - port: 3100
+      targetPort: 3100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-grafana
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-grafana
+  template:
+    metadata:
+      labels:
+        app: pivot-grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.0.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "admin"
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: "false"
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana-datasources
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-grafana
+  namespace: pivot-banking
+spec:
+  type: LoadBalancer
+  selector:
+    app: pivot-grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-kafka-ui
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pivot-kafka-ui
+  template:
+    metadata:
+      labels:
+        app: pivot-kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: provectuslabs/kafka-ui:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DYNAMIC_CONFIG_ENABLED
+              value: "true"
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: "pivot-banking-cluster"
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: "pivot-kafka:9092"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-kafka-ui
+  namespace: pivot-banking
+spec:
+  type: LoadBalancer
+  selector:
+    app: pivot-kafka-ui
+  ports:
+    - port: 8090
+      targetPort: 8080

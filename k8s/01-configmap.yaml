@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pivot-config
+  namespace: pivot-banking
+data:
+  # --- Infraestructura (nombres DNS de los Services de Kubernetes) ---
+  CONFIG_SERVER_URI: "http://ms-config:8888"
+  EUREKA_URI: "http://ms-eureka:8761/eureka/"
+  EUREKA_HOSTNAME: "ms-eureka"
+  REDIS_HOST: "pivot-redis"
+  REDIS_PORT: "6379"
+  KAFKA_BOOTSTRAP_SERVERS: "pivot-kafka:9092"
+  VAULT_URI: "http://pivot-vault:8200"
+
+  # --- URLs entre microservicios (DNS interno del namespace) ---
+  CUSTOMER_SERVICE_URL: "http://ms-customer:8081/api/v1/customers"
+  ACCOUNT_SERVICE_URL: "http://ms-account:8082/api/v1/accounts"
+  DEBIT_CARD_SERVICE_URL: "http://ms-account:8082/api/v1/debit-cards"
+  CREDIT_SERVICE_URL: "http://ms-credit:8083/api/v1/credits"
+
+  # --- Seguridad ---
+  JWT_AUTH_ENABLED: "true"
+
+  # --- Logging: ruta escribible dentro del contenedor (no ../ENVIROMENT/logs) ---
+  LOG_PATH: "/tmp/pivot-logs"
+  JAVA_TOOL_OPTIONS: "-DLOG_PATH=/tmp/pivot-logs"
+
+  # --- Actuator: habilita /actuator/health/liveness y /actuator/health/readiness ---
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"

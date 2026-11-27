@@ -1,0 +1,437 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-auth
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-auth
+  template:
+    metadata:
+      labels:
+        app: ms-auth
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-auth
+          image: pivot/ms-auth:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_auth"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-auth
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-auth
+  ports:
+    - port: 8085
+      targetPort: 8085
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-customer
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-customer
+  template:
+    metadata:
+      labels:
+        app: ms-customer
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-customer
+          image: pivot/ms-customer:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_customer"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-customer
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-customer
+  ports:
+    - port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-credit
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-credit
+  template:
+    metadata:
+      labels:
+        app: ms-credit
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-credit
+          image: pivot/ms-credit:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_credit"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8083
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8083
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8083
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-credit
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-credit
+  ports:
+    - port: 8083
+      targetPort: 8083
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-account
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-account
+  template:
+    metadata:
+      labels:
+        app: ms-account
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-account
+          image: pivot/ms-account:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_account"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-account
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-account
+  ports:
+    - port: 8082
+      targetPort: 8082
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-transaction
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-transaction
+  template:
+    metadata:
+      labels:
+        app: ms-transaction
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-transaction
+          image: pivot/ms-transaction:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_transaction"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-transaction
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-transaction
+  ports:
+    - port: 8084
+      targetPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-yanki
+  namespace: pivot-banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-yanki
+  template:
+    metadata:
+      labels:
+        app: ms-yanki
+    spec:
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: ms-yanki
+          image: pivot/ms-yanki:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+          envFrom:
+            - configMapRef:
+                name: pivot-config
+            - secretRef:
+                name: pivot-secrets
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://ms-config:8888"
+            - name: MONGODB_URI
+              value: "mongodb://pivot-mongodb:27017/db_pivot_yanki"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8086
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-yanki
+  namespace: pivot-banking
+spec:
+  selector:
+    app: ms-yanki
+  ports:
+    - port: 8086
+      targetPort: 8086
