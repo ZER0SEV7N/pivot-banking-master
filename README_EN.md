@@ -58,6 +58,7 @@ Observability covers the three pillars:
 | `observability/dashboards/pivot-banking-grafana-dashboard.json` | LogQL metrics and logs dashboard, auto-provisioned. |
 | `Pivot Banking - Master Architecture.drawio` | Master `.drawio` file with the 15 UML diagrams. |
 | `../Diagram/` | PNG/PDF exports and diagram documentation. |
+| `../Diagram/ms-*.drawio` | Per-microservice diagrams: use cases, classes, sequence, and state machines. |
 | `Pivot Banking - Master Collection.Final.postman_collection.json` | Phase III master Postman collection. |
 | `colecciones/` | Phase II and intermediate master Postman collections. |
 | `1-start-vault.ps1` | Starts native HashiCorp Vault in DEV mode at `http://127.0.0.1:8200`. |
@@ -435,7 +436,7 @@ From a span, use **Logs for this span** to open Loki with the same `traceId`.
 
 ### Docker Compose requirement
 
-Promtail mounts the full workspace at `/workspace` (read-only) and looks for `<workspace>/pivot-ms-*/logs/*.log`. Run each microservice with its module folder as the *working directory* (default behavior in IntelliJ/VS Code and `mvn spring-boot:run`), so Logback writes to `pivot-ms-<service>/logs/ms-<service>.log`. If you run it from another path, set `-DLOG_PATH=<absolute-path>` or copy the `.log` file to `ENVIROMENT/logs/`.
+Promtail mounts the full workspace at `/workspace` (read-only) and looks for `<workspace>/pivot-ms-*/logs/*.log`. Run each microservice with its module folder as the *working directory* (default behavior in IntelliJ/VS Code and `mvn spring-boot:run`), so Logback writes to `pivot-ms-<service>/logs/ms-<service>.log`. If you run it from another path, set `-DLOG_PATH=<absolute-path>` or copy the `.log` file to ``.
 
 In Kubernetes, Promtail reads `/var/log/pods/pivot-banking_*/*/*.log`. Docker Desktop writes Docker JSON logs, so the pipeline uses `docker: {}`. On a containerd/CRI cluster, replace that stage with `cri: {}` in `k8s/08-promtail.yaml`.
 

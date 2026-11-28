@@ -58,6 +58,7 @@ La observabilidad cubre los tres pilares:
 | `observability/dashboards/pivot-banking-grafana-dashboard.json` | Dashboard de métricas (LogQL) y logs, provisionado automáticamente. |
 | `Pivot Banking - Master Architecture.drawio` | Archivo maestro `.drawio` con los 15 diagramas UML. |
 | `../Diagram/` | Exportaciones PNG/PDF y documentación de los diagramas. |
+| `../Diagram/ms-*.drawio` | Diagramas por microservicio: casos de uso, clases, secuencia y máquina de estados. |
 | `Pivot Banking - Master Collection.Final.postman_collection.json` | Colección Postman maestra de Fase III. |
 | `colecciones/` | Colecciones Postman de Fase II y masters intermedias. |
 | `1-start-vault.ps1` | Levanta HashiCorp Vault nativo en modo DEV en `http://127.0.0.1:8200`. |
@@ -435,7 +436,7 @@ Desde un span, usa **Logs for this span** para abrir Loki con el mismo `traceId`
 
 ### Requisito para Docker Compose
 
-Promtail monta el workspace completo en `/workspace` (solo lectura) y busca `<workspace>/pivot-ms-*/logs/*.log`. Ejecuta cada microservicio con su carpeta de módulo como *working directory* (comportamiento por defecto de IntelliJ/VS Code y de `mvn spring-boot:run`), de modo que Logback escriba en `pivot-ms-<servicio>/logs/ms-<servicio>.log`. Si lo ejecutas desde otra ruta, define `-DLOG_PATH=<ruta absoluta>` o copia el `.log` a `ENVIROMENT/logs/`.
+Promtail monta el workspace completo en `/workspace` (solo lectura) y busca `<workspace>/pivot-ms-*/logs/*.log`. Ejecuta cada microservicio con su carpeta de módulo como *working directory* (comportamiento por defecto de IntelliJ/VS Code y de `mvn spring-boot:run`), de modo que Logback escriba en `pivot-ms-<servicio>/logs/ms-<servicio>.log`. Si lo ejecutas desde otra ruta, define `-DLOG_PATH=<ruta absoluta>` o copia el `.log` a ``.
 
 En Kubernetes, Promtail lee `/var/log/pods/pivot-banking_*/*/*.log`. Docker Desktop escribe los logs en formato Docker JSON, por eso el pipeline usa `docker: {}`. En un clúster con containerd/CRI, cambia ese stage por `cri: {}` en `k8s/08-promtail.yaml`.
 
